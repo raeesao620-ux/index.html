@@ -96,3 +96,21 @@ app.get('/api/background-check/:idNumber', authenticateToken, async (req, res) =
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
+// Authentication-related functions
+export function authenticateUser(id, mobile) {
+  return fetch(`${process.env.REACT_APP_AUTH_URL}/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ id, mobile })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      return data.user;
+    } else {
+      throw new Error('Authentication failed');
+    }
+  });
+}
