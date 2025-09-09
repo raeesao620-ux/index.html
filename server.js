@@ -114,3 +114,72 @@ export function authenticateUser(id, mobile) {
     }
   });
 }
+// Back Office Portal-related functions
+export function showBackOfficeSection(sectionId) {
+  const sections = ['dashboardSection', 'applicationsSection', 'certificatesAdmin', 'permitsAdmin'];
+  sections.forEach(section => {
+    document.getElementById(section).classList.add('hidden');
+  });
+  document.getElementById(sectionId).classList.remove('hidden');
+}
+
+export function fetchApplications() {
+  // Implement application fetching logic here
+  fetch(`${process.env.REACT_APP_BACK_OFFICE_URL}/applications`)
+    .then(response => response.json())
+    .then(data => {
+      const applicationsTable = document.getElementById('applicationsTable');
+      applicationsTable.innerHTML = '';
+      data.applications.forEach(app => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${app.reference}</td>
+          <td>${app.name}</td>
+          <td>${app.status}</td>
+          <td><button onclick="approveApplication('${app.reference}')">Approve</button> <button onclick="rejectApplication('${app.reference}')">Reject</button></td>
+        `;
+        applicationsTable.appendChild(row);
+      });
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+}
+
+export function approveApplication(reference) {
+  // Implement application approval logic here
+  fetch(`${process.env.REACT_APP_BACK_OFFICE_URL}/applications/${reference}/approve`, {
+    method: 'POST'
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Application approved successfully!');
+      fetchApplications();
+    } else {
+      alert('Failed to approve application.');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+
+export function rejectApplication(reference) {
+  // Implement application rejection logic here
+  fetch(`${process.env.REACT_APP_BACK_OFFICE_URL}/applications/${reference}/reject`, {
+    method: 'POST'
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Application rejected successfully!');
+      fetchApplications();
+    } else {
+      alert('Failed to reject application.');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
